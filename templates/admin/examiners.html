@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Examiners · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Examiners</h1><p class="page-sub">Approve applications and manage examiner accounts.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search by id, name, email or status" data-filter-table="#examiners-table">
+  <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.examiners') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if examiner_list %}
+  <div class="table-wrap">
+    <table class="table" id="examiners-table">
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Qualification</th><th>Specialization</th><th>Experience</th><th>Application</th><th>Account</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for examiner in examiner_list %}
+        <tr>
+          <td>{{ examiner.id }}</td>
+          <td><strong>{{ examiner.name }}</strong></td>
+          <td>{{ examiner.email }}</td>
+          <td>{{ examiner.examiner_profile.qualification or '—' }}</td>
+          <td>{{ examiner.examiner_profile.specialization or '—' }}</td>
+          <td>{{ examiner.examiner_profile.experience if examiner.examiner_profile.experience is not none else '—' }} yrs</td>
+          <td>
+            {% set approval = examiner.examiner_profile.approval_status %}
+            <span class="badge {{ 'warn' if approval == 'Pending' else ('success' if approval == 'Approved' else 'danger') }}">{{ approval }}</span>
+          </td>
+          <td><span class="badge {{ 'success' if examiner.status == 'Active' else 'muted' }}">{{ examiner.status }}</span></td>
+          <td>
+            <div class="actions">
+              {% if examiner.examiner_profile.approval_status == 'Pending' %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.approve_examiner', user_id=examiner.id) }}">
+                <button class="btn btn-success btn-sm" type="submit">Approve</button>
+              </form>
+              <form class="inline-form" method="post" action="{{ url_for('admin.reject_examiner', user_id=examiner.id) }}" data-confirm="Reject this examiner application?">
+                <button class="btn btn-danger btn-sm" type="submit">Reject</button>
+              </form>
+              {% endif %}
+              {% if examiner.status == 'Active' %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.deactivate_examiner', user_id=examiner.id) }}" data-confirm="Deactivate {{ examiner.name }}? They will not be able to log in.">
+                <button class="btn btn-warning btn-sm" type="submit">Deactivate</button>
+              </form>
+              {% else %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.activate_examiner', user_id=examiner.id) }}">
+                <button class="btn btn-success btn-sm" type="submit">Activate</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No examiners registered yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

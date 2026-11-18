@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Evaluate Student · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Evaluate — {{ booking.student.name }}</h1>
+    <p class="page-sub">Enter marks for each evaluation criterion. The total is calculated automatically.</p>
+  </div>
+</div>
+
+<div class="card" style="max-width:860px">
+  <div class="info-list" style="margin-bottom:1.1rem">
+    <li><span>Booking</span><span>#{{ booking.id }} · <span class="badge {{ 'warn' if booking.status == 'Booked' else ('success' if booking.status == 'Completed' else 'muted') }}">{{ booking.status }}</span></span></li>
+    <li><span>Student</span><span>{{ booking.student.name }} (ID {{ booking.student.id }})</span></li>
+    <li><span>Examination</span><span>{{ exam.name }} · {{ exam.course.code }}</span></li>
+    <li><span>Slot</span><span>{{ booking.slot.date.strftime('%d %b %Y') }} · {{ booking.slot.start_time.strftime('%H:%M') }}–{{ booking.slot.end_time.strftime('%H:%M') }}</span></li>
+  </div>
+
+  {% if rubrics %}
+  <form method="post" class="stack">
+    {% for rubric in rubrics %}
+    <div class="criteria-row">
+      <div class="criteria-name">{{ rubric.title }}
+        <small>{{ rubric.description or 'Evaluation criterion ' ~ loop.index }}</small>
+      </div>
+      <input type="number" step="0.5" min="0" max="{{ rubric.maximum_marks }}"
+             name="marks_{{ rubric.id }}" data-max="{{ rubric.maximum_marks }}"
+             value="{{ scores[rubric.id].marks if rubric.id in scores else '' }}"
+             placeholder="0–{{ rubric.maximum_marks }}" required aria-label="Marks for {{ rubric.title }}">
+      <span class="muted small">/ {{ rubric.maximum_marks }}</span>
+    </div>
+    {% endfor %}
+    <div class="criteria-row" style="border-bottom:none">
+      <div class="criteria-name">Total</div>
+      <span></span>
+      <span><strong data-marks-total>0.00</strong> <span class="muted small">marks</span></span>
+    </div>
+    <div class="field">
+      <label for="feedback">Feedback</label>
+      <textarea id="feedback" name="feedback" placeholder="Qualitative feedback for the student (optional)">{{ booking.feedback or '' }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Submit Evaluation</button>
+      <a class="btn btn-ghost" href="{{ url_for('examiner.bookings') }}">Cancel</a>
+    </div>
+  </form>
+  {% else %}
+  <div class="empty">No evaluation criteria defined for this examination.
+    <a href="{{ url_for('examiner.examinations') }}">Add criteria first</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}

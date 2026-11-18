@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Courses · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Courses</h1><p class="page-sub">Manage the courses offered by the portal.</p></div>
+  <div class="head-actions"><a class="btn btn-primary" href="{{ url_for('admin.add_course') }}">+ Add Course</a></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search by id, name or code" data-filter-table="#courses-table">
+  <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.courses') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if course_list %}
+  <div class="table-wrap">
+    <table class="table" id="courses-table">
+      <thead><tr><th>ID</th><th>Course Name</th><th>Course Code</th><th>Description</th><th>Examinations</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for course in course_list %}
+        <tr>
+          <td>{{ course.id }}</td>
+          <td><strong>{{ course.name }}</strong></td>
+          <td><span class="badge info">{{ course.code }}</span></td>
+          <td class="muted">{{ course.description or '—' }}</td>
+          <td>{{ course.examinations|length }}</td>
+          <td>
+            <div class="actions">
+              <a class="btn btn-ghost btn-sm" href="{{ url_for('admin.edit_course', course_id=course.id) }}">Update</a>
+              <form class="inline-form" method="post" action="{{ url_for('admin.delete_course', course_id=course.id) }}" data-confirm="Delete course '{{ course.name }}'? This cannot be undone.">
+                <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No courses found. Use “+ Add Course” to create the first one.</div>
+  {% endif %}
+</div>
+{% endblock %}

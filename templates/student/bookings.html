@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}My Bookings · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Booking Summary</h1><p class="page-sub">All your bookings with status, marks and examiner feedback.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for status in ('Booked', 'Completed', 'Cancelled') %}
+    <option value="{{ status }}" {{ 'selected' if selected_status == status }}>{{ status }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+  {% if selected_status %}<a class="btn btn-ghost btn-sm" href="{{ url_for('student.bookings') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if bookings %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Booking</th><th>Examination</th><th>Slot</th><th>Status</th><th>Marks</th><th>Feedback</th><th>Booked At</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td>#{{ booking.id }}</td>
+          <td><strong>{{ booking.slot.examination.name }}</strong><br><span class="muted small">{{ booking.slot.examination.examination_type }}</span></td>
+          <td>{{ booking.slot.date.strftime('%d %b %Y') }}<br><span class="muted small">{{ booking.slot.start_time.strftime('%H:%M') }}–{{ booking.slot.end_time.strftime('%H:%M') }}</span></td>
+          <td>
+            {% set bs = booking.status %}
+            <span class="badge {{ 'success' if bs == 'Booked' else ('muted' if bs in ('Completed', 'Cancelled') else 'warn') }}">{{ bs }}</span>
+          </td>
+          <td class="num">{{ booking.marks if booking.marks is not none else '—' }}</td>
+          <td class="muted small">{{ booking.feedback or '—' }}</td>
+          <td>{{ booking.booked_at.strftime('%d %b %Y %H:%M') if booking.booked_at else '—' }}</td>
+          <td>
+            {% if booking.status == 'Booked' %}
+            <form class="inline-form" method="post" action="{{ url_for('student.cancel_booking', booking_id=booking.id) }}" data-confirm="Cancel booking #{{ booking.id }} for {{ booking.slot.examination.name }}?">
+              <button class="btn btn-danger btn-sm" type="submit">Cancel</button>
+            </form>
+            {% else %}
+            <span class="muted small">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No bookings yet. <a href="{{ url_for('student.examinations') }}">Browse examinations</a> to book your first slot.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Students · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Students</h1><p class="page-sub">All registered students and their account status.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search by id, name or email" data-filter-table="#students-table">
+  <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.students') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if student_list %}
+  <div class="table-wrap">
+    <table class="table" id="students-table">
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Contact No.</th><th>Bookings</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for student in student_list %}
+        <tr>
+          <td>{{ student.id }}</td>
+          <td><strong>{{ student.name }}</strong></td>
+          <td>{{ student.email }}</td>
+          <td>{{ student.contact_no }}</td>
+          <td>{{ student.bookings|length }}</td>
+          <td><span class="badge {{ 'success' if student.status == 'Active' else 'muted' }}">{{ student.status }}</span></td>
+          <td>{{ student.created_at.strftime('%d %b %Y') if student.created_at else '—' }}</td>
+          <td>
+            {% if student.status == 'Active' %}
+            <form class="inline-form" method="post" action="{{ url_for('admin.toggle_student', user_id=student.id) }}" data-confirm="Deactivate {{ student.name }}?">
+              <button class="btn btn-warning btn-sm" type="submit">Deactivate</button>
+            </form>
+            {% else %}
+            <form class="inline-form" method="post" action="{{ url_for('admin.toggle_student', user_id=student.id) }}">
+              <button class="btn btn-success btn-sm" type="submit">Activate</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No students found.</div>
+  {% endif %}
+</div>
+{% endblock %}

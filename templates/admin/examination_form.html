@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Examination' if exam else 'Add Examination' }} · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ 'Update Examination' if exam else 'Add Examination' }}</h1>
+    <p class="page-sub">Examinations start in Draft state; open slot creation and booking from the list page.</p>
+  </div>
+</div>
+<div class="card" style="max-width:760px">
+  <form method="post" class="form-grid">
+    <div class="field">
+      <label for="course_id">Course</label>
+      <select id="course_id" name="course_id" required>
+        <option value="">Select course…</option>
+        {% for course in course_list %}
+        <option value="{{ course.id }}" {{ 'selected' if exam and exam.course_id == course.id }}>{{ course.code }} · {{ course.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="examiner_id">Assigned Examiner (optional)</label>
+      <select id="examiner_id" name="examiner_id">
+        <option value="">Assign later…</option>
+        {% for examiner in examiner_list %}
+        <option value="{{ examiner.id }}" {{ 'selected' if exam and exam.examiner_id == examiner.id }}>{{ examiner.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field span-2">
+      <label for="name">Examination Name</label>
+      <input id="name" name="name" value="{{ exam.name if exam else '' }}" placeholder="e.g. MAD-1 Final Term Exam" required>
+    </div>
+    <div class="field">
+      <label for="examination_type">Examination Type</label>
+      <select id="examination_type" name="examination_type" required>
+        <option value="">Select type…</option>
+        {% for type in exam_types %}
+        <option value="{{ type }}" {{ 'selected' if exam and exam.examination_type == type }}>{{ type }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="duration">Duration (minutes)</label>
+      <input id="duration" name="duration" type="number" min="1" max="600" value="{{ exam.duration if exam else '' }}" required>
+    </div>
+    <div class="field">
+      <label for="examination_date">Examination Date</label>
+      <input id="examination_date" name="examination_date" type="date"
+             value="{{ exam.examination_date.strftime('%Y-%m-%d') if exam else '' }}" required>
+    </div>
+    <div class="field span-2">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Instructions or notes for this examination (optional)">{{ exam.description if exam else '' }}</textarea>
+    </div>
+    <div class="form-actions span-2">
+      <button class="btn btn-primary" type="submit">{{ 'Update' if exam else 'Add Examination' }}</button>
+      <a class="btn btn-ghost" href="{{ url_for('admin.examinations') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

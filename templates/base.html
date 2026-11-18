@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}examsmanager — Examination Management Portal{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{{ url_for('main.home') }}">
+      <span class="brand-mark">eM</span>
+      <span class="brand-text">exams<span class="brand-accent">manager</span></span>
+    </a>
+    <nav class="main-nav">
+      {% if current_user.role == 'Admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">Dashboard</a>
+        <a href="{{ url_for('admin.courses') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('admin.course') }}">Courses</a>
+        <a href="{{ url_for('admin.examinations') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('admin.examination') or request.endpoint == 'admin.timeline' }}">Examinations</a>
+        <a href="{{ url_for('admin.examiners') }}" class="{{ 'active' if request.endpoint == 'admin.examiners' }}">Examiners</a>
+        <a href="{{ url_for('admin.students') }}" class="{{ 'active' if request.endpoint == 'admin.students' }}">Students</a>
+        <a href="{{ url_for('admin.slots') }}" class="{{ 'active' if request.endpoint == 'admin.slots' }}">Slots</a>
+        <a href="{{ url_for('admin.bookings') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('admin.booking') }}">Bookings</a>
+      {% elif current_user.role == 'Examiner' %}
+        <a href="{{ url_for('examiner.dashboard') }}" class="{{ 'active' if request.endpoint == 'examiner.dashboard' }}">Dashboard</a>
+        <a href="{{ url_for('examiner.examinations') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('examiner.examination') or request.endpoint == 'examiner.add_slot' or request.endpoint == 'examiner.edit_slot' }}">My Examinations</a>
+        <a href="{{ url_for('examiner.bookings') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('examiner.booking') or request.endpoint == 'examiner.evaluate' }}">Evaluations</a>
+      {% elif current_user.role == 'Student' %}
+        <a href="{{ url_for('student.dashboard') }}" class="{{ 'active' if request.endpoint == 'student.dashboard' }}">Dashboard</a>
+        <a href="{{ url_for('student.examinations') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('student.examination') }}">Examinations</a>
+        <a href="{{ url_for('student.bookings') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('student.booking') }}">My Bookings</a>
+      {% endif %}
+    </nav>
+    <div class="topbar-actions">
+      <a class="user-chip" href="{% if current_user.role == 'Admin' %}{{ url_for('admin.profile') }}{% elif current_user.role == 'Examiner' %}{{ url_for('examiner.profile') }}{% else %}{{ url_for('student.profile') }}{% endif %}">
+        <span class="avatar">{{ current_user.name[:1]|upper }}</span>
+        <span class="user-meta">
+          <span class="user-name">{{ current_user.name }}</span>
+          <span class="user-role">{{ current_user.role }}</span>
+        </span>
+      </a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </div>
+</header>
+{% endif %}
+
+<main class="page">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-stack" data-flash-stack>
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}<button type="button" class="flash-close" aria-label="Dismiss">&times;</button></div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <span>examsmanager — Examination Management Portal</span>
+  <span>&copy; {{ current_year }} · MAD-1 Project</span>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

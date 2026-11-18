@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard · examsmanager{% endblock %}
+{% block content %}
+<div class="dash-banner">
+  <div>
+    <h1>Administrator Dashboard</h1>
+    <p>Overview of courses, examinations, users and bookings in examsmanager.</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-success" href="{{ url_for('admin.add_examination') }}">+ Add Examination</a>
+    <a class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.6)" href="{{ url_for('admin.add_course') }}">+ Add Course</a>
+  </div>
+</div>
+
+<div class="grid-4">
+  <div class="stat-card"><span class="stat-value">{{ stats.total_students }}</span><span class="stat-label">Students</span></div>
+  <div class="stat-card amber"><span class="stat-value">{{ stats.total_examiners }}</span><span class="stat-label">Examiners {% if stats.pending_examiners %}<span class="badge warn">{{ stats.pending_examiners }} pending</span>{% endif %}</span></div>
+  <div class="stat-card"><span class="stat-value">{{ stats.total_courses }}</span><span class="stat-label">Courses</span></div>
+  <div class="stat-card green"><span class="stat-value">{{ stats.total_examinations }}</span><span class="stat-label">Examinations</span></div>
+  <div class="stat-card"><span class="stat-value">{{ stats.total_slots }}</span><span class="stat-label">Exam Slots</span></div>
+  <div class="stat-card red"><span class="stat-value">{{ stats.total_bookings }}</span><span class="stat-label">Bookings</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <h2 class="card-title">Recent Bookings</h2>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('admin.bookings') }}">View all bookings</a>
+  </div>
+  {% if recent_bookings %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Booking ID</th><th>Student</th><th>Examination</th><th>Slot</th><th>Status</th><th>Booked At</th></tr></thead>
+      <tbody>
+        {% for booking in recent_bookings %}
+        <tr>
+          <td>#{{ booking.id }}</td>
+          <td>{{ booking.student.name }}</td>
+          <td>{{ booking.slot.examination.name }}</td>
+          <td>{{ booking.slot.date.strftime('%d %b %Y') }} · {{ booking.slot.start_time.strftime('%H:%M') }}</td>
+          <td><span class="badge {{ 'success' if booking.status == 'Booked' else 'muted' }}">{{ booking.status }}</span></td>
+          <td>{{ booking.booked_at.strftime('%d %b %Y %H:%M') if booking.booked_at else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No bookings have been made yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

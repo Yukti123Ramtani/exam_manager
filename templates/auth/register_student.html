@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Student Registration · examsmanager{% endblock %}
+{% block content %}
+<section class="auth-center">
+  <section class="card auth-card wide" aria-labelledby="reg-heading">
+    <h1 class="card-title center">Student Registration</h1>
+    <p class="muted center">Create your student account to browse and book examination slots.</p>
+    <form method="post" class="form-grid">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" value="{{ form.get('name', '') }}" required>
+      </div>
+      <div class="field">
+        <label for="email">Email Id</label>
+        <input id="email" type="email" name="email" value="{{ form.get('email', '') }}" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" minlength="8" required>
+        <span class="hint">At least 8 characters.</span>
+      </div>
+      <div class="field">
+        <label for="confirm_password">Confirm Password</label>
+        <input id="confirm_password" type="password" name="confirm_password" minlength="8" required>
+      </div>
+      <div class="field">
+        <label for="contact_no">Contact No.</label>
+        <input id="contact_no" name="contact_no" inputmode="numeric" pattern="\d{10}" maxlength="10"
+               value="{{ form.get('contact_no', '') }}" placeholder="10-digit mobile number" required>
+      </div>
+      <div class="form-actions span-2">
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a class="btn btn-ghost" href="{{ url_for('auth.login') }}">Cancel</a>
+      </div>
+    </form>
+  </section>
+</section>
+{% endblock %}

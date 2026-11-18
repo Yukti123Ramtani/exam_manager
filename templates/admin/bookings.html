@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Bookings · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Bookings</h1><p class="page-sub">Reschedule bookings or change the assigned examiner.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search by id, student, exam or status" data-filter-table="#bookings-table">
+  <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.bookings') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if booking_list %}
+  <div class="table-wrap">
+    <table class="table" id="bookings-table">
+      <thead><tr><th>ID</th><th>Student</th><th>Examination</th><th>Slot</th><th>Status</th><th>Marks</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for booking in booking_list %}
+        <tr>
+          <td>{{ booking.id }}</td>
+          <td><strong>{{ booking.student.name }}</strong><br><span class="muted small">{{ booking.student.email }}</span></td>
+          <td>{{ booking.slot.examination.name }}</td>
+          <td>{{ booking.slot.date.strftime('%d %b %Y') }}<br><span class="muted small">{{ booking.slot.start_time.strftime('%H:%M') }}–{{ booking.slot.end_time.strftime('%H:%M') }}</span></td>
+          <td>
+            {% set bs = booking.status %}
+            <span class="badge {{ 'success' if bs == 'Booked' else ('muted' if bs in ('Completed', 'Cancelled') else 'warn') }}">{{ bs }}</span>
+          </td>
+          <td class="num">{{ booking.marks if booking.marks is not none else '—' }}</td>
+          <td>
+            {% if booking.status == 'Booked' %}
+            <form class="inline-form" method="post" action="{{ url_for('admin.reschedule_booking', booking_id=booking.id) }}" style="margin-bottom:.45rem">
+              <div class="inline-controls">
+                <select name="slot_id" required aria-label="Reschedule to slot">
+                  <option value="">Reschedule to…</option>
+                  {% for slot in booking.slot.examination.slots %}
+                  {% if slot.id != booking.slot_id and slot.status == 'Available' and slot.available_seats > 0 %}
+                  <option value="{{ slot.id }}">{{ slot.date.strftime('%d %b') }} {{ slot.start_time.strftime('%H:%M') }} ({{ slot.available_seats }} seats)</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+                <button class="btn btn-primary btn-sm" type="submit">Reschedule</button>
+              </div>
+            </form>
+            <form class="inline-form" method="post" action="{{ url_for('admin.change_examiner', booking_id=booking.id) }}">
+              <div class="inline-controls">
+                <select name="examiner_id" required aria-label="Change examiner">
+                  <option value="">Change examiner to…</option>
+                  {% for examiner in examiner_list %}
+                  <option value="{{ examiner.id }}">{{ examiner.name }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-ghost btn-sm" type="submit">Change Examiner</button>
+              </div>
+            </form>
+            {% else %}
+            <span class="muted small">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No bookings found.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Welcome · examsmanager{% endblock %}
+{% block content %}
+<section class="home-hero">
+  <div class="home-brand">
+    <span class="brand-mark big">eM</span>
+    <h1>exams<span class="brand-accent">manager</span></h1>
+    <p class="muted">One portal for administrators, examiners and students to manage examination slots, bookings and evaluations.</p>
+  </div>
+
+  <div class="note-card" role="note">
+    <h2>Important Note</h2>
+    <ol>
+      <li>Examiner registration is <strong>not mandatory</strong> for every examination.</li>
+      <li>You can log in with your account right after completing the registration.</li>
+      <li>New examiners can access the portal only after the administrator approves the application.</li>
+    </ol>
+  </div>
+
+  <div class="auth-panels">
+    <section class="card auth-card" aria-labelledby="login-heading">
+      <h2 id="login-heading" class="card-title center">Login</h2>
+      <form method="post" action="{{ url_for('auth.login') }}" class="stack">
+        <div class="field">
+          <label for="login-email">Email Id</label>
+          <input id="login-email" type="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+      </form>
+      <p class="form-hint center">New here?
+        <a href="{{ url_for('auth.register_student') }}">Register as Student</a> ·
+        <a href="{{ url_for('auth.register_examiner') }}">as Examiner</a>
+      </p>
+    </section>
+
+    <section class="card auth-card" aria-labelledby="register-heading">
+      <h2 id="register-heading" class="card-title center">Register</h2>
+      <div class="stack">
+        <div class="field">
+          <label>I am registering as</label>
+          <div class="radio-row">
+            <label class="radio"><input type="radio" name="register-role" value="student" checked> Student</label>
+            <label class="radio"><input type="radio" name="register-role" value="examiner"> Examiner</label>
+          </div>
+        </div>
+        <p class="muted small">Continue to the registration form and fill in your name, email, password and contact number.</p>
+        <button type="button" class="btn btn-primary btn-block" data-role-redirect>Register</button>
+      </div>
+      <p class="form-hint center">Already registered? Use the Login panel.</p>
+    </section>
+  </div>
+
+  <div class="home-roles">
+    <div class="role-tile">
+      <h3>Administrator</h3>
+      <p>Manage courses, examinations, examiner approvals, students, slots and bookings.</p>
+    </div>
+    <div class="role-tile">
+      <h3>Examiner</h3>
+      <p>View assigned examinations, create exam slots and evaluate students with rubrics.</p>
+    </div>
+    <div class="role-tile">
+      <h3>Student</h3>
+      <p>Browse available examinations, book a slot and track booking status and results.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

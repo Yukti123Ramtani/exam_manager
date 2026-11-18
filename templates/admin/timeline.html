@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Timeline · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Configure Timeline — {{ examination.name }}</h1>
+    <p class="page-sub">Set when the examiner can create slots and when students can book. Leave a field empty to keep it unrestricted.</p>
+  </div>
+  <div class="head-actions"><span class="badge info">{{ examination.status }}</span></div>
+</div>
+
+<div class="card" style="max-width:860px">
+  <div class="info-list" style="margin-bottom:1.1rem">
+    <li><span>Course</span><span>{{ examination.course.code }} · {{ examination.course.name }}</span></li>
+    <li><span>Type / Date</span><span>{{ examination.examination_type }} · {{ examination.examination_date.strftime('%d %b %Y') }}</span></li>
+    <li><span>Assigned examiner</span><span>{{ examination.examiner.name if examination.examiner else 'Not assigned' }}</span></li>
+  </div>
+  <form method="post" class="timeline-grid">
+    <div class="field">
+      <label for="examiner_slot_open">Examiner Slot Window — Open</label>
+      <input id="examiner_slot_open" name="examiner_slot_open" type="datetime-local"
+             value="{{ examination.examiner_slot_open.strftime('%Y-%m-%dT%H:%M') if examination.examiner_slot_open else '' }}">
+    </div>
+    <div class="field">
+      <label for="examiner_slot_close">Examiner Slot Window — Close</label>
+      <input id="examiner_slot_close" name="examiner_slot_close" type="datetime-local"
+             value="{{ examination.examiner_slot_close.strftime('%Y-%m-%dT%H:%M') if examination.examiner_slot_close else '' }}">
+    </div>
+    <div class="field">
+      <label for="student_booking_open">Student Booking — Open</label>
+      <input id="student_booking_open" name="student_booking_open" type="datetime-local"
+             value="{{ examination.student_booking_open.strftime('%Y-%m-%dT%H:%M') if examination.student_booking_open else '' }}">
+    </div>
+    <div class="field">
+      <label for="student_booking_close">Student Booking — Close / Cancellation deadline</label>
+      <input id="student_booking_close" name="student_booking_close" type="datetime-local"
+             value="{{ examination.student_booking_close.strftime('%Y-%m-%dT%H:%M') if examination.student_booking_close else '' }}">
+    </div>
+    <div class="field">
+      <label for="exam_start">Exam Start</label>
+      <input id="exam_start" name="exam_start" type="datetime-local"
+             value="{{ examination.exam_start.strftime('%Y-%m-%dT%H:%M') if examination.exam_start else '' }}">
+    </div>
+    <div class="field">
+      <label for="exam_end">Exam End</label>
+      <input id="exam_end" name="exam_end" type="datetime-local"
+             value="{{ examination.exam_end.strftime('%Y-%m-%dT%H:%M') if examination.exam_end else '' }}">
+    </div>
+    <div class="form-actions span-2">
+      <button class="btn btn-primary" type="submit">Update</button>
+      <a class="btn btn-ghost" href="{{ url_for('admin.examinations') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

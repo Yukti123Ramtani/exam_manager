@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Exam Slots · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Exam Slots</h1><p class="page-sub">All examiner-created slots across examinations.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search by slot id or examination name" data-filter-table="#slots-table">
+  <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.slots') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if slot_list %}
+  <div class="table-wrap">
+    <table class="table" id="slots-table">
+      <thead><tr><th>Slot ID</th><th>Examination</th><th>Examiner</th><th>Date</th><th>Start</th><th>End</th><th>Capacity</th><th>Available</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for slot in slot_list %}
+        <tr>
+          <td>{{ slot.id }}</td>
+          <td>{{ slot.examination.name }}</td>
+          <td>{{ slot.examiner.name }}</td>
+          <td>{{ slot.date.strftime('%d %b %Y') }}</td>
+          <td>{{ slot.start_time.strftime('%H:%M') }}</td>
+          <td>{{ slot.end_time.strftime('%H:%M') }}</td>
+          <td class="num">{{ slot.maximum_student_capacity }}</td>
+          <td class="num">{{ slot.available_seats }}</td>
+          <td><span class="badge {{ 'success' if slot.status == 'Available' else ('danger' if slot.status == 'Full' else 'muted') }}">{{ slot.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No slots have been created yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

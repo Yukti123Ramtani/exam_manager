@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}403 · examsmanager{% endblock %}
+{% block content %}
+<section class="auth-center">
+  <div class="card auth-card center">
+    <h1 class="error-code">403</h1>
+    <h2 class="card-title">Access denied</h2>
+    <p class="muted">You do not have permission to open this page with your current role.</p>
+    <a class="btn btn-primary" href="{{ url_for('main.home') }}">Go Home</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ examination.name }} · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ examination.name }}</h1>
+    <p class="page-sub">{{ examination.course.code }} · {{ examination.course.name }} · {{ examination.examination_type }}</p>
+  </div>
+  <div class="head-actions"><span class="badge {{ 'success' if examination.status == 'Bookings Open' else 'warn' }}">{{ examination.status }}</span></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2 class="card-title">Examination Details</h2>
+    <ul class="info-list">
+      <li><span>Date</span><span>{{ examination.examination_date.strftime('%d %b %Y') }}</span></li>
+      <li><span>Duration</span><span>{{ examination.duration }} minutes</span></li>
+      <li><span>Assigned Examiner</span><span>{{ examination.examiner.name if examination.examiner else 'To be announced' }}</span></li>
+      {% if examination.exam_start %}<li><span>Exam Start</span><span>{{ examination.exam_start.strftime('%d %b %Y %H:%M') }}</span></li>{% endif %}
+      {% if examination.exam_end %}<li><span>Exam End</span><span>{{ examination.exam_end.strftime('%d %b %Y %H:%M') }}</span></li>{% endif %}
+    </ul>
+    {% if examination.description %}<p class="muted small" style="margin-top:.8rem">{{ examination.description }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Your Booking</h2>
+    {% if existing_booking %}
+    <ul class="info-list">
+      <li><span>Slot</span><span>{{ existing_booking.slot.date.strftime('%d %b %Y') }} · {{ existing_booking.slot.start_time.strftime('%H:%M') }}–{{ existing_booking.slot.end_time.strftime('%H:%M') }}</span></li>
+      <li><span>Status</span><span><span class="badge success">{{ existing_booking.status }}</span></span></li>
+      <li><span>Room / Examiner</span><span>{{ existing_booking.slot.examiner.name }}</span></li>
+    </ul>
+    <p class="muted small">You already have a booking for this examination. Manage it from <a href="{{ url_for('student.bookings') }}">My Bookings</a>.</p>
+    {% elif booking_open %}
+    <form method="post" class="stack" id="slot-form" data-slot-form data-book-base="{{ url_for('student.book_slot', slot_id=0) }}">
+      <p class="muted small">Select one of the available slots below and confirm your booking.</p>
+      <div class="slot-grid">
+        {% for slot in slots %}
+        <label class="slot-card">
+          <input type="radio" name="slot_choice" value="{{ slot.id }}" required>
+          <span class="slot-date">{{ slot.date.strftime('%d %b %Y') }}</span>
+          <span class="slot-meta">
+            <span>{{ slot.start_time.strftime('%H:%M') }} – {{ slot.end_time.strftime('%H:%M') }}</span>
+            <span><strong>{{ slot.available_seats }}</strong> of {{ slot.maximum_student_capacity }} seats free</span>
+            <span>Examiner: {{ slot.examiner.name }}</span>
+          </span>
+        </label>
+        {% else %}
+        <div class="empty">No open slots with free seats at the moment.</div>
+        {% endfor %}
+      </div>
+      {% if slots %}
+      <button class="btn btn-primary" type="submit" style="align-self:flex-start">Book Selected Slot</button>
+      {% endif %}
+    </form>
+    {% elif examination.status == 'Bookings Open' %}
+    <div class="empty">Booking is temporarily closed. Check the booking window in the examination timeline.</div>
+    {% else %}
+    <div class="empty">Student booking is not open for this examination.</div>
+    {% endif %}
+  </div>
+</div>
+
+<p style="margin-top:1rem"><a class="btn btn-ghost btn-sm" href="{{ url_for('student.examinations') }}">&larr; Back to examinations</a></p>
+{% endblock %}

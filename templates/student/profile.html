@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Student Profile · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">My Profile</h1><p class="page-sub">Update your account details and password.</p></div>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <h2 class="card-title">Account Details</h2>
+    <form method="post" class="stack">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" value="{{ current_user.name }}" required>
+      </div>
+      <div class="field">
+        <label for="contact_no">Contact No.</label>
+        <input id="contact_no" name="contact_no" inputmode="numeric" maxlength="10" pattern="\d{10}" value="{{ current_user.contact_no }}" required>
+      </div>
+      <div class="field">
+        <label>Email (read only)</label>
+        <input value="{{ current_user.email }}" disabled>
+      </div>
+      <button class="btn btn-primary" type="submit">Update</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Change Password</h2>
+    <form method="post" class="stack" data-password-check>
+      <div class="field">
+        <label for="current_password">Current Password</label>
+        <input id="current_password" type="password" name="current_password" autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="new_password">New Password</label>
+        <input id="new_password" type="password" name="new_password" minlength="8" autocomplete="new-password">
+        <span class="hint">At least 8 characters.</span>
+      </div>
+      <div class="field">
+        <label for="confirm_password">Confirm New Password</label>
+        <input id="confirm_password" type="password" name="confirm_password" minlength="8" autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary" type="submit">Change Password</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

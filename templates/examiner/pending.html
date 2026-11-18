@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Application Pending · examsmanager{% endblock %}
+{% block content %}
+<section class="auth-center">
+  <section class="card auth-card center">
+    <div class="pending-icon">&#9203;</div>
+    <h1 class="card-title">Application Under Review</h1>
+    <p class="muted">Your examiner registration has been received.<br>
+      The administrator needs to approve your application before you can access the examiner portal.</p>
+    <p class="muted small">You can close this page and log in again once your application is approved.</p>
+    <a class="btn btn-primary" href="{{ url_for('auth.logout') }}">Back to Login</a>
+  </section>
+</section>
+{% endblock %}

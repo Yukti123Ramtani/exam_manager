@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Examinations · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Available Examinations</h1><p class="page-sub">Examinations with open or recently closed bookings.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search examinations" data-filter-table="#exams-table">
+  <select name="type">
+    <option value="">All types</option>
+    {% for type in exam_types %}
+    <option value="{{ type }}" {{ 'selected' if selected_type == type }}>{{ type }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+  {% if q or selected_type %}<a class="btn btn-ghost btn-sm" href="{{ url_for('student.examinations') }}">Reset</a>{% endif %}
+</form>
+
+{% if examinations %}
+<div class="grid-2">
+  {% for exam in examinations %}
+  <div class="card" style="margin-bottom:0">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title">{{ exam.name }}</h2>
+        <p class="muted small" style="margin:0">{{ exam.course.code }} · {{ exam.course.name }}</p>
+      </div>
+      <span class="badge {{ 'success' if exam.status == 'Bookings Open' else 'warn' }}">{{ exam.status }}</span>
+    </div>
+    <ul class="info-list" style="margin-bottom:.9rem">
+      <li><span>Type</span><span>{{ exam.examination_type }}</span></li>
+      <li><span>Date</span><span>{{ exam.examination_date.strftime('%d %b %Y') }}</span></li>
+      <li><span>Duration</span><span>{{ exam.duration }} minutes</span></li>
+    </ul>
+    {% if exam.description %}<p class="muted small">{{ exam.description }}</p>{% endif %}
+    <a class="btn btn-primary btn-sm" href="{{ url_for('student.examination_detail', exam_id=exam.id) }}">View Slots & Book</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><div class="empty">No examinations available right now. Please check back later.</div></div>
+{% endif %}
+{% endblock %}

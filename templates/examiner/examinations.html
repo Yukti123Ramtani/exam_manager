@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}My Examinations · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">My Examinations</h1><p class="page-sub">Examinations assigned to you. Create slots while slot creation is open, then evaluate students with your criteria.</p></div>
+</div>
+
+{% if exams %}
+{% for exam in exams %}
+<div class="card">
+  <div class="card-head">
+    <div>
+      <h2 class="card-title">{{ exam.name }}</h2>
+      <p class="muted small" style="margin:0">
+        {{ exam.course.code }} · {{ exam.course.name }} · {{ exam.examination_type }}
+        · {{ exam.examination_date.strftime('%d %b %Y') }} · {{ exam.duration }} min
+      </p>
+    </div>
+    <div class="head-actions">
+      <span class="badge {{ {'Draft':'muted','Slot Creation':'info','Bookings Open':'success','Bookings Closed':'warn','Ongoing':'info','Completed':'muted','Cancelled':'danger'}.get(exam.status, 'muted') }}">{{ exam.status }}</span>
+      {% if slot_creation_open(exam) %}
+      <a class="btn btn-success btn-sm" href="{{ url_for('examiner.add_slot', exam_id=exam.id) }}">+ Add Slot</a>
+      {% else %}
+      <span class="badge muted">Slot creation closed</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <h3 class="card-title" style="font-size:.95rem">Exam Slots</h3>
+  {% set exam_slots = slots_by_exam.get(exam.id, []) %}
+  {% if exam_slots %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Slot</th><th>Date</th><th>Start</th><th>End</th><th>Capacity</th><th>Booked</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for slot in exam_slots %}
+        <tr>
+          <td>#{{ slot.id }}</td>
+          <td>{{ slot.date.strftime('%d %b %Y') }}</td>
+          <td>{{ slot.start_time.strftime('%H:%M') }}</td>
+          <td>{{ slot.end_time.strftime('%H:%M') }}</td>
+          <td>{{ slot.maximum_student_capacity }}</td>
+          <td>{{ slot.maximum_student_capacity - slot.available_seats }}</td>
+          <td><span class="badge {{ 'success' if slot.status == 'Available' else ('danger' if slot.status == 'Full' else 'muted') }}">{{ slot.status }}</span></td>
+          <td>
+            <div class="actions">
+              {% if not slots_locked(exam) %}
+              <a class="btn btn-ghost btn-sm" href="{{ url_for('examiner.edit_slot', slot_id=slot.id) }}">Update</a>
+              <form class="inline-form" method="post" action="{{ url_for('examiner.delete_slot', slot_id=slot.id) }}" data-confirm="Remove slot #{{ slot.id }}?">
+                <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+              </form>
+              {% else %}
+              <span class="badge muted">Locked</span>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No slots created for this examination yet.
+    {% if slot_creation_open(exam) %}Use “+ Add Slot” to create the first one.{% endif %}</div>
+  {% endif %}
+
+  <h3 class="card-title" style="font-size:.95rem; margin-top:1.2rem">Evaluation Criteria</h3>
+  {% set exam_rubrics = rubrics_by_exam.get(exam.id, []) %}
+  {% if exam_rubrics %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Criterion</th><th>Description</th><th>Maximum Marks</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for rubric in exam_rubrics %}
+        <tr>
+          <td><strong>{{ rubric.title }}</strong></td>
+          <td class="muted">{{ rubric.description or '—' }}</td>
+          <td>{{ rubric.maximum_marks }}</td>
+          <td>
+            <form class="inline-form" method="post" action="{{ url_for('examiner.delete_rubric', rubric_id=rubric.id) }}" data-confirm="Remove criterion '{{ rubric.title }}'?">
+              <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No evaluation criteria yet — add at least one before evaluating students.</div>
+  {% endif %}
+  <form class="inline-controls" method="post" action="{{ url_for('examiner.add_rubric', exam_id=exam.id) }}" style="margin-top:.7rem">
+    <input name="title" placeholder="Criterion title" required style="max-width:220px">
+    <input name="description" placeholder="Description (optional)" style="max-width:260px">
+    <input name="maximum_marks" type="number" min="1" max="1000" placeholder="Max marks" required style="max-width:110px">
+    <button class="btn btn-success btn-sm" type="submit">Add Criterion</button>
+  </form>
+</div>
+{% endfor %}
+{% else %}
+<div class="card"><div class="empty">No examinations are assigned to you yet. The administrator assigns examinations from the admin portal.</div></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Login · examsmanager{% endblock %}
+{% block content %}
+<section class="auth-center">
+  <section class="card auth-card" aria-labelledby="login-heading">
+    <div class="auth-brand"><span class="brand-mark">eM</span><h1>exams<span class="brand-accent">manager</span></h1></div>
+    <h2 id="login-heading" class="card-title center">Login</h2>
+    <form method="post" action="{{ url_for('auth.login') }}" class="stack">
+      <div class="field">
+        <label for="email">Email Id</label>
+        <input id="email" type="email" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+    <p class="form-hint center">No account?
+      <a href="{{ url_for('auth.register_student') }}">Register as Student</a> ·
+      <a href="{{ url_for('auth.register_examiner') }}">Register as Examiner</a>
+    </p>
+    <p class="form-hint center"><a href="{{ url_for('main.home') }}">&larr; Back to home</a></p>
+  </section>
+</section>
+{% endblock %}

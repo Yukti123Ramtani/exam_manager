@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Update Slot' if slot else 'Add Slot' }} · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ 'Update Slot' if slot else 'Add Exam Slot' }}</h1>
+    <p class="page-sub">{{ exam.name }} · {{ exam.course.code }} · {{ exam.examination_date.strftime('%d %b %Y') }}</p>
+  </div>
+</div>
+<div class="card" style="max-width:640px">
+  <form method="post" class="form-grid">
+    <div class="field">
+      <label for="date">Date</label>
+      <input id="date" name="date" type="date"
+             value="{{ slot.date.strftime('%Y-%m-%d') if slot else '' }}" required>
+    </div>
+    <div class="field">
+      <label for="start_time">Start Time</label>
+      <input id="start_time" name="start_time" type="time"
+             value="{{ slot.start_time.strftime('%H:%M') if slot else '' }}" required>
+    </div>
+    <div class="field">
+      <label for="end_time">End Time</label>
+      <input id="end_time" name="end_time" type="time"
+             value="{{ slot.end_time.strftime('%H:%M') if slot else '' }}" required>
+    </div>
+    <div class="field">
+      <label for="maximum_student_capacity">Maximum Student Capacity</label>
+      <input id="maximum_student_capacity" name="maximum_student_capacity" type="number" min="1" max="500"
+             value="{{ slot.maximum_student_capacity if slot else '' }}" required>
+      {% if slot %}<span class="hint">Currently {{ slot.maximum_student_capacity - slot.available_seats }} seat(s) booked.</span>{% endif %}
+    </div>
+    <div class="form-actions span-2">
+      <button class="btn btn-primary" type="submit">{{ 'Update' if slot else 'Add Slot' }}</button>
+      <a class="btn btn-ghost" href="{{ url_for('examiner.examinations') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

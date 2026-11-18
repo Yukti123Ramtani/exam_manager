@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Examinations · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Examinations</h1><p class="page-sub">Create examinations, assign examiners and control the lifecycle.</p></div>
+  <div class="head-actions"><a class="btn btn-primary" href="{{ url_for('admin.add_examination') }}">+ Add Examination</a></div>
+</div>
+
+<form class="search-bar" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search by id, name, course or status" data-filter-table="#exams-table">
+  <button class="btn btn-primary btn-sm" type="submit">Search</button>
+  {% if q %}<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.examinations') }}">Reset</a>{% endif %}
+</form>
+
+{% set status_badges = {'Draft':'muted','Slot Creation':'info','Bookings Open':'success','Bookings Closed':'warn','Ongoing':'info','Completed':'muted','Cancelled':'danger'} %}
+
+<div class="card">
+  {% if exam_list %}
+  <div class="table-wrap">
+    <table class="table" id="exams-table">
+      <thead><tr><th>ID</th><th>Examination</th><th>Course</th><th>Type</th><th>Date</th><th>Duration</th><th>Assigned Examiner</th><th>Slots</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for exam in exam_list %}
+        <tr>
+          <td>{{ exam.id }}</td>
+          <td><strong>{{ exam.name }}</strong><br><span class="muted small">{{ exam.description or '' }}</span></td>
+          <td>{{ exam.course.code }} · {{ exam.course.name }}</td>
+          <td>{{ exam.examination_type }}</td>
+          <td>{{ exam.examination_date.strftime('%d %b %Y') }}</td>
+          <td>{{ exam.duration }} min</td>
+          <td>
+            {% if exam.examiner %}{{ exam.examiner.name }}{% else %}<span class="badge warn">Not assigned</span>{% endif %}
+          </td>
+          <td>{{ exam.slots|length }}</td>
+          <td><span class="badge {{ status_badges.get(exam.status, 'muted') }}">{{ exam.status }}</span></td>
+          <td>
+            <div class="actions">
+              <a class="btn btn-ghost btn-sm" href="{{ url_for('admin.edit_examination', exam_id=exam.id) }}">Update</a>
+              <a class="btn btn-ghost btn-sm" href="{{ url_for('admin.timeline', exam_id=exam.id) }}">Timeline</a>
+              {% if not exam.examiner %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.assign_examiner', exam_id=exam.id) }}">
+                <div class="inline-controls">
+                  <select name="examiner_id" required aria-label="Assign examiner">
+                    <option value="">Assign examiner…</option>
+                    {% for examiner in examiner_list %}
+                    <option value="{{ examiner.id }}">{{ examiner.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-success btn-sm" type="submit">Assign</button>
+                </div>
+              </form>
+              {% endif %}
+              {% if exam.status == 'Draft' %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.exam_status', exam_id=exam.id) }}" data-confirm="Open slot creation for the assigned examiner?">
+                <input type="hidden" name="action" value="open_slot_creation">
+                <button class="btn btn-success btn-sm" type="submit">Open Slot Creation</button>
+              </form>
+              {% elif exam.status == 'Slot Creation' %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.exam_status', exam_id=exam.id) }}" data-confirm="Open student booking for this examination?">
+                <input type="hidden" name="action" value="open_booking">
+                <button class="btn btn-success btn-sm" type="submit">Open Booking</button>
+              </form>
+              {% elif exam.status == 'Bookings Open' %}
+              <form class="inline-form" method="post" action="{{ url_for('admin.exam_status', exam_id=exam.id) }}" data-confirm="Close student booking for this examination?">
+                <input type="hidden" name="action" value="close_booking">
+                <button class="btn btn-warning btn-sm" type="submit">Close Booking</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No examinations found. Use “+ Add Examination” to create one.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+    <div>
+        Message: {{ message }}
+    </div>
+    <div>
+        <input v-model="message" />
+    </div>
+    <p v-bind:title="message">Hover over this paragraph</p>
+    <button @click="updateMsg">Update message</button>
+</div>
+<script src="./vue-test.js"></script>
+
+</body>
+</html>

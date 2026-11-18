@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Evaluations · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="page-title">Student Bookings & Evaluations</h1><p class="page-sub">Students booked into your slots. Open a booking to enter marks against your criteria.</p></div>
+</div>
+
+<form class="search-bar" method="get">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for status in ('Booked', 'Completed', 'Cancelled') %}
+    <option value="{{ status }}" {{ 'selected' if selected_status == status }}>{{ status }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+  {% if selected_status %}<a class="btn btn-ghost btn-sm" href="{{ url_for('examiner.bookings') }}">Reset</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if bookings %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Booking</th><th>Student</th><th>Examination</th><th>Slot</th><th>Status</th><th>Total Marks</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td>#{{ booking.id }}</td>
+          <td><strong>{{ booking.student.name }}</strong><br><span class="muted small">{{ booking.student.email }}</span></td>
+          <td>{{ booking.slot.examination.name }}</td>
+          <td>{{ booking.slot.date.strftime('%d %b %Y') }}<br><span class="muted small">{{ booking.slot.start_time.strftime('%H:%M') }}–{{ booking.slot.end_time.strftime('%H:%M') }}</span></td>
+          <td>
+            {% set bs = booking.status %}
+            <span class="badge {{ 'warn' if bs == 'Booked' else ('success' if bs == 'Completed' else 'muted') }}">{{ bs }}</span>
+          </td>
+          <td class="num">{{ booking.marks if booking.marks is not none else '—' }}</td>
+          <td>
+            <a class="btn btn-success btn-sm" href="{{ url_for('examiner.evaluate', booking_id=booking.id) }}">
+              {{ 'Update Evaluation' if booking.status == 'Completed' else 'Evaluate' }}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No bookings found for this filter.</div>
+  {% endif %}
+</div>
+{% endblock %}

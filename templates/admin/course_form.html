@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Course' if course else 'Add Course' }} · examsmanager{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">{{ 'Update Course' if course else 'Add Course' }}</h1>
+    <p class="page-sub">Fields marked with the form are required.</p>
+  </div>
+</div>
+<div class="card" style="max-width:640px">
+  <form method="post" class="stack">
+    <div class="field">
+      <label for="name">Course Name</label>
+      <input id="name" name="name" value="{{ course.name if course else '' }}" placeholder="e.g. Modern Application Development I" required>
+    </div>
+    <div class="field">
+      <label for="code">Course Code</label>
+      <input id="code" name="code" value="{{ course.code if course else '' }}" placeholder="e.g. MAD101" required>
+    </div>
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Short description of the course (optional)">{{ course.description if course else '' }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{{ 'Update' if course else 'Add Course' }}</button>
+      <a class="btn btn-ghost" href="{{ url_for('admin.courses') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
